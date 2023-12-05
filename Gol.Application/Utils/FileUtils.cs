@@ -9,9 +9,8 @@ namespace Gol.Application.Utils
     /// </summary>
     public static class FileUtils
     {
-        private const string ExamplesDirectoryName = "Examples";
-
-        private const string FilesFilter = "Life saves (*.life)|*.life|All files (*.*)|*.*";
+        private const string EXAMPLES_DIRECTORY_NAME = "Examples";
+        private const string FILES_FILTER = "Life saves (*.life)|*.life|All files (*.*)|*.*";
 
         /// <summary>
         ///     Get example folder location.
@@ -19,8 +18,8 @@ namespace Gol.Application.Utils
         /// <returns>Return default initial directory path.</returns>
         private static string GetInitialDirectory()
         {
-            var initialDirectory = Environment.CurrentDirectory;
-            var examplePath = Path.Combine(Environment.CurrentDirectory, ExamplesDirectoryName);
+            var initialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var examplePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, EXAMPLES_DIRECTORY_NAME);
 
             if (Directory.Exists(examplePath))
             {
@@ -37,7 +36,7 @@ namespace Gol.Application.Utils
             var saveDialog = new SaveFileDialog
             {
                 InitialDirectory = GetInitialDirectory(),
-                Filter = FilesFilter,
+                Filter = FILES_FILTER,
                 RestoreDirectory = true
             };
 
@@ -60,7 +59,7 @@ namespace Gol.Application.Utils
             var openDialog = new OpenFileDialog
             {
                 InitialDirectory = GetInitialDirectory(),
-                Filter = FilesFilter,
+                Filter = FILES_FILTER,
                 RestoreDirectory = true
             };
 

@@ -12,7 +12,11 @@ namespace Gol.Core.Algorithm
     /// </summary>
     public class DoubleStateLife : NotificationObject //, ILifeControl<bool>
     {
-        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(35);
+        public enum FieldType
+        {
+            Infinity = 0,
+            Bound = 1
+        }
 
         //    -1   0   1
         // -1 [ ] [ ] [ ]
@@ -21,29 +25,26 @@ namespace Gol.Core.Algorithm
         private readonly Offset[] _offsets =
         {
             // Line 1
-            new Offset(-1, -1),
-            new Offset(0, -1),
-            new Offset(1, -1),
+            new(-1, -1),
+            new(0, -1),
+            new(1, -1),
 
             // Line 2
-            new Offset(-1, 0),
-            new Offset(1, 0),
+            new(-1, 0),
+            new(1, 0),
 
             // Line 3
-            new Offset(-1, 1),
-            new Offset(0, 1),
-            new Offset(1, 1)
+            new(-1, 1),
+            new(0, 1),
+            new(1, 1)
         };
 
-        private bool _stopUpdateTimer;
-
-        private MonoLifeGrid<bool>? _current;
-
-        private MonoLifeGrid<bool>? _previous;
-
-        private int _generationNumber;
-
+        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(35);
         private FieldType _boundType;
+        private MonoLifeGrid<bool>? _current;
+        private int _generationNumber;
+        private MonoLifeGrid<bool>? _previous;
+        private bool _stopUpdateTimer;
 
         /// <summary>
         ///     Constructor for <see cref="DoubleStateLife" />.
@@ -58,12 +59,6 @@ namespace Gol.Core.Algorithm
         /// </summary>
         private DoubleStateLife()
         {
-        }
-
-        public enum FieldType
-        {
-            Infinity = 0,
-            Bound = 1
         }
 
         /// <summary>
@@ -240,65 +235,49 @@ namespace Gol.Core.Algorithm
         [MethodImpl(MethodImplOptions.Synchronized)]
         private Task LifeStep()
         {
-            return Task.Run(
-                () =>
+            return Task.Run(() =>
+            {
+                /*
+                https://ru.wikipedia.org/wiki/%D0%96%D0%B8%D0%B7%D0%BD%D1%8C_(%D0%B8%D0%B3%D1%80%D0%B0)
+                - В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
+                - Если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить; в противном случае, если соседей 
+                  меньше двух или больше трёх, клетка умирает («от одиночества» или «от перенаселённости»)
+                */
+                _previous = _current;
+                _current = _current!.Clone();
+
+                for (var i = 0; i < _current.Width; i++)
                 {
-                    /*
-                    https://ru.wikipedia.org/wiki/%D0%96%D0%B8%D0%B7%D0%BD%D1%8C_(%D0%B8%D0%B3%D1%80%D0%B0)
-                    - В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
-                    - Если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить; в противном случае, если соседей 
-                      меньше двух или больше трёх, клетка умирает («от одиночества» или «от перенаселённости»)
-                    */
-                    _previous = _current;
-                    _current = _current.Clone();
-
-                    for (var i = 0; i < _current.Width; i++)
+                    for (var j = 0; j < _current.Height; j++)
                     {
-                        for (var j = 0; j < _current.Height; j++)
-                        {
-                            var nearCells = NearCells(i, j, Previous);
-                            var isCreature = Previous[i, j];
+                        var nearCells = NearCells(i, j, Previous);
+                        var isCreature = Previous[i, j];
 
-                            if (isCreature)
-                            {
-                                // Если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить;
-                                _current[i, j] = nearCells == 2 || nearCells == 3;
-                            }
-                            else
-                            {
-                                // В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
-                                _current[i, j] = nearCells == 3;
-                            }
+                        if (isCreature)
+                        {
+                            // Если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить;
+                            _current[i, j] = nearCells == 2 || nearCells == 3;
+                        }
+                        else
+                        {
+                            // В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
+                            _current[i, j] = nearCells == 3;
                         }
                     }
+                }
 
-                    GenerationNumber++;
+                GenerationNumber++;
 
-                    RaisePropertyChanged(nameof(Current));
-                    RaisePropertyChanged(nameof(Previous));
-                });
+                RaisePropertyChanged(nameof(Current));
+                RaisePropertyChanged(nameof(Previous));
+            });
         }
 
-        private class Offset
-        {
-            /// <summary>
-            ///     Constructor for <see cref="Offset" />.
-            /// </summary>
-            public Offset(int dx, int dy)
-            {
-                Dx = dx;
-                Dy = dy;
-            }
-
-            /// <summary>
-            ///     X offset.
-            /// </summary>
-            public int Dx { get; }
-
-            /// <summary>
-            ///     Y offset.
-            /// </summary>
-            public int Dy { get; }
-        }
+        /// <summary>
+        ///     Offset coordinates
+        /// </summary>
+        /// <param name="Dx">X offset</param>
+        /// <param name="Dy">Y offset</param>
+        private readonly record struct Offset(int Dx, int Dy);
     }
 }

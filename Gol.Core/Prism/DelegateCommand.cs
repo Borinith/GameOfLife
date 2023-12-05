@@ -9,7 +9,6 @@ namespace Gol.Core.Prism
     public class DelegateCommand : ICommand
     {
         private readonly Predicate<object>? _canExecute;
-
         private readonly Action<object> _execute;
 
         /// <summary>
@@ -22,15 +21,7 @@ namespace Gol.Core.Prism
         }
 
         /// <inheritdoc />
-        public event EventHandler CanExecuteChanged;
-
-        /// <summary>
-        ///     Raise can execute command.
-        /// </summary>
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+        public event EventHandler? CanExecuteChanged;
 
         /// <inheritdoc />
         bool ICommand.CanExecute(object parameter)
@@ -47,6 +38,14 @@ namespace Gol.Core.Prism
         void ICommand.Execute(object parameter)
         {
             _execute(parameter);
+        }
+
+        /// <summary>
+        ///     Raise can execute command.
+        /// </summary>
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

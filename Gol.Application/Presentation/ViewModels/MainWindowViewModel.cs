@@ -12,9 +12,8 @@ namespace Gol.Application.Presentation.ViewModels
     /// </summary>
     public class MainWindowViewModel : NotificationObject
     {
-        private const int DefaultFieldWidth = 126;
-
-        private const int DefaultFieldHeight = 58;
+        private const int DEFAULT_FIELD_WIDTH = 126;
+        private const int DEFAULT_FIELD_HEIGHT = 58;
 
         private DoubleStateLife _doubleStateLife;
 
@@ -23,7 +22,7 @@ namespace Gol.Application.Presentation.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            var grid = new MonoLifeGrid<bool>(new bool[DefaultFieldWidth, DefaultFieldHeight], Guid.NewGuid());
+            var grid = new MonoLifeGrid<bool>(new bool[DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT], Guid.NewGuid());
 
             _doubleStateLife = new DoubleStateLife(grid);
             StartCommand = new DelegateCommand(Start);
@@ -129,11 +128,11 @@ namespace Gol.Application.Presentation.ViewModels
 
         private void Save(object obj)
         {
-            if (FileUtils.TryGetSaveFile(out var fileStream))
+            if (DoubleStateLife.Current is not null && FileUtils.TryGetSaveFile(out var fileStream) && fileStream is not null)
             {
                 using (fileStream)
                 {
-                    SerializationUtils.Save(fileStream!, DoubleStateLife.Current);
+                    SerializationUtils.Save(fileStream, DoubleStateLife.Current);
                 }
             }
         }
@@ -160,7 +159,7 @@ namespace Gol.Application.Presentation.ViewModels
 
         private void New(object obj)
         {
-            var grid = new MonoLifeGrid<bool>(new bool[DefaultFieldWidth, DefaultFieldHeight], Guid.NewGuid());
+            var grid = new MonoLifeGrid<bool>(new bool[DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT], Guid.NewGuid());
             DoubleStateLife = new DoubleStateLife(grid);
         }
 

@@ -361,27 +361,12 @@ namespace Gol.Core.Controls.Views
             };
         }
 
-        private struct IntPoint
-        {
-            /// <summary>
-            ///     Constructor for <see cref="IntPoint" />.
-            /// </summary>
-            public IntPoint(int x, int y)
-            {
-                X = x;
-                Y = y;
-            }
-
-            /// <summary>
-            ///     X ordinate.
-            /// </summary>
-            public int X { get; }
-
-            /// <summary>
-            ///     Y ordinate.
-            /// </summary>
-            public int Y { get; }
-        }
+        /// <summary>
+        ///     Cell coordinates
+        /// </summary>
+        /// <param name="X">X ordinate</param>
+        /// <param name="Y">Y ordinate</param>
+        private readonly record struct IntPoint(int X, int Y);
 
         private class CellData
         {
