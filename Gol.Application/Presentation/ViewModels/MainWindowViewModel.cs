@@ -104,7 +104,7 @@ namespace Gol.Application.Presentation.ViewModels
         /// </summary>
         public DelegateCommand BoundCommand { get; set; }
 
-        private void About(object obj)
+        private static void About(object obj)
         {
             var aboutWindow = new AboutWindow
             {
@@ -137,7 +137,7 @@ namespace Gol.Application.Presentation.ViewModels
             }
         }
 
-        private void Exit(object obj)
+        private static void Exit(object obj)
         {
             System.Windows.Application.Current.Shutdown();
         }
@@ -165,12 +165,12 @@ namespace Gol.Application.Presentation.ViewModels
 
         private void Infinity(object obj)
         {
-            DoubleStateLife.Field(DoubleStateLife.FieldType.Infinity);
+            DoubleStateLife.Field(FieldType.Infinity);
         }
 
         private void Bound(object obj)
         {
-            DoubleStateLife.Field(DoubleStateLife.FieldType.Bound);
+            DoubleStateLife.Field(FieldType.Bound);
         }
     }
 }

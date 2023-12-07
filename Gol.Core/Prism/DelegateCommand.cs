@@ -14,7 +14,7 @@ namespace Gol.Core.Prism
         /// <summary>
         ///     Constructor for <see cref="DelegateCommand" />.
         /// </summary>
-        public DelegateCommand(Action<object> execute, Predicate<object> canExecute = null)
+        public DelegateCommand(Action<object> execute, Predicate<object>? canExecute = null)
         {
             _execute = execute;
             _canExecute = canExecute;

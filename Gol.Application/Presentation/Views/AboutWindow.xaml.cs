@@ -18,8 +18,10 @@ namespace Gol.Application.Presentation.Views
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
-            e.Handled = true;
+            using (_ = Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri)))
+            {
+                e.Handled = true;
+            }
         }
     }
 }

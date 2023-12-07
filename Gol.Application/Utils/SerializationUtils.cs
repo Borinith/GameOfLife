@@ -7,7 +7,7 @@ namespace Gol.Application.Utils
     /// <summary>
     ///     Serialization methods.
     /// </summary>
-    public class SerializationUtils
+    public static class SerializationUtils
     {
         /// <summary>
         ///     Save object to file.

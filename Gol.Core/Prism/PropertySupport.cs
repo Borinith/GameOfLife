@@ -36,12 +36,12 @@ namespace Gol.Core.Prism
 
             var member = body.Member as PropertyInfo;
 
-            if (member == null)
+            if (member == null || member.GetGetMethod(true) is null)
             {
                 throw new ArgumentException();
             }
 
-            if (member.GetGetMethod(true).IsStatic)
+            if (member.GetGetMethod(true)!.IsStatic)
             {
                 throw new ArgumentException();
             }

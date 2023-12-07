@@ -1,4 +1,5 @@
 ﻿using Gol.Core.Controls.Models;
+using Gol.Core.Data;
 using Gol.Core.Prism;
 using System;
 using System.Linq;
@@ -10,14 +11,8 @@ namespace Gol.Core.Algorithm
     /// <summary>
     ///     Black and White life cycle algorithm.
     /// </summary>
-    public class DoubleStateLife : NotificationObject //, ILifeControl<bool>
+    public class DoubleStateLife : NotificationObject, ILifeControl<bool>
     {
-        public enum FieldType
-        {
-            Infinity = 0,
-            Bound = 1
-        }
-
         //    -1   0   1
         // -1 [ ] [ ] [ ]
         //  0 [ ] [X] [ ]
@@ -75,8 +70,25 @@ namespace Gol.Core.Algorithm
             }
         }
 
+        /// <summary>
+        ///     Generation number.
+        /// </summary>
+        public int GenerationNumber
+        {
+            get => _generationNumber;
+
+            set
+            {
+                if (_generationNumber != value)
+                {
+                    _generationNumber = value;
+                    RaisePropertyChanged(nameof(GenerationNumber));
+                }
+            }
+        }
+
         /// <inheritdoc />
-        public MonoLifeGrid<bool> Previous
+        public MonoLifeGrid<bool>? Previous
         {
             get => _previous;
 
@@ -105,25 +117,8 @@ namespace Gol.Core.Algorithm
             }
         }
 
-        /// <summary>
-        ///     Generation number.
-        /// </summary>
-        public int GenerationNumber
-        {
-            get => _generationNumber;
-
-            set
-            {
-                if (_generationNumber != value)
-                {
-                    _generationNumber = value;
-                    RaisePropertyChanged(nameof(GenerationNumber));
-                }
-            }
-        }
-
         /// <inheritdoc />
-        private void SetCurrent(MonoLifeGrid<bool>? grid)
+        public void SetCurrent(MonoLifeGrid<bool>? grid)
         {
             if (grid == null)
             {
@@ -250,8 +245,8 @@ namespace Gol.Core.Algorithm
                 {
                     for (var j = 0; j < _current.Height; j++)
                     {
-                        var nearCells = NearCells(i, j, Previous);
-                        var isCreature = Previous[i, j];
+                        var nearCells = NearCells(i, j, Previous!);
+                        var isCreature = Previous![i, j];
 
                         if (isCreature)
                         {
@@ -272,12 +267,5 @@ namespace Gol.Core.Algorithm
                 RaisePropertyChanged(nameof(Previous));
             });
         }
-
-        /// <summary>
-        ///     Offset coordinates
-        /// </summary>
-        /// <param name="Dx">X offset</param>
-        /// <param name="Dy">Y offset</param>
-        private readonly record struct Offset(int Dx, int Dy);
     }
 }
