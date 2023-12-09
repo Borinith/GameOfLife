@@ -104,7 +104,7 @@ namespace Gol.Application.Presentation.ViewModels
         /// </summary>
         public DelegateCommand BoundCommand { get; set; }
 
-        private static void About(object obj)
+        private static void About(object? obj)
         {
             var aboutWindow = new AboutWindow
             {
@@ -114,7 +114,7 @@ namespace Gol.Application.Presentation.ViewModels
             aboutWindow.ShowDialog();
         }
 
-        private void Open(object obj)
+        private void Open(object? obj)
         {
             if (FileUtils.TryGetOpenFile(out var fileStream))
             {
@@ -126,7 +126,7 @@ namespace Gol.Application.Presentation.ViewModels
             }
         }
 
-        private void Save(object obj)
+        private void Save(object? obj)
         {
             if (DoubleStateLife.Current is not null && FileUtils.TryGetSaveFile(out var fileStream) && fileStream is not null)
             {
@@ -137,38 +137,38 @@ namespace Gol.Application.Presentation.ViewModels
             }
         }
 
-        private static void Exit(object obj)
+        private static void Exit(object? obj)
         {
             System.Windows.Application.Current.Shutdown();
         }
 
-        private void Start(object obj)
+        private void Start(object? obj)
         {
             DoubleStateLife.Start();
         }
 
-        private void Stop(object obj)
+        private void Stop(object? obj)
         {
             DoubleStateLife.Stop();
         }
 
-        private void Rand(object obj)
+        private void Rand(object? obj)
         {
             DoubleStateLife.Random();
         }
 
-        private void New(object obj)
+        private void New(object? obj)
         {
             var grid = new MonoLifeGrid<bool>(new bool[DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT], Guid.NewGuid());
             DoubleStateLife = new DoubleStateLife(grid);
         }
 
-        private void Infinity(object obj)
+        private void Infinity(object? obj)
         {
             DoubleStateLife.Field(FieldType.Infinity);
         }
 
-        private void Bound(object obj)
+        private void Bound(object? obj)
         {
             DoubleStateLife.Field(FieldType.Bound);
         }

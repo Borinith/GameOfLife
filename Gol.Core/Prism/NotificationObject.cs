@@ -46,9 +46,7 @@ namespace Gol.Core.Prism
                 throw new ArgumentNullException(nameof(propertyNames));
             }
 
-            var strArrays = propertyNames;
-
-            foreach (var propertyName in strArrays)
+            foreach (var propertyName in propertyNames)
             {
                 RaisePropertyChanged(propertyName);
             }
@@ -75,43 +73,6 @@ namespace Gol.Core.Prism
             else
             {
                 RaisePropertyChanged(propertyName);
-            }
-        }
-    }
-
-    [Serializable]
-    public static class NotificationObjectStatic
-    {
-        /// <summary>
-        ///     Raised when a static property on this object has a new value.
-        /// </summary>
-        public static event PropertyChangedEventHandler? StaticPropertyChanged;
-
-        /// <summary>
-        ///     Raises this object's PropertyChanged event.
-        /// </summary>
-        /// <param name="propertyName">The static property that has a new value.</param>
-        public static void OnStaticPropertyChanged(string propertyName)
-        {
-            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public static void RaiseStaticPropertyChanged<T>(Expression<Func<T>> propertyExpression)
-        {
-            if (StaticPropertyChanged == null)
-            {
-                return;
-            }
-
-            var propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
-
-            if (!Dispatcher.CurrentDispatcher.CheckAccess())
-            {
-                Dispatcher.CurrentDispatcher.Invoke(() => OnStaticPropertyChanged(propertyName));
-            }
-            else
-            {
-                OnStaticPropertyChanged(propertyName);
             }
         }
     }

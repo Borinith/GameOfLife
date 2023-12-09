@@ -10,12 +10,12 @@ namespace Gol.Core.Data
         /// <summary>
         ///     Previous generation.
         /// </summary>
-        MonoLifeGrid<TValue> Previous { get; }
+        MonoLifeGrid<bool>? Previous { get; }
 
         /// <summary>
         ///     Current generation.
         /// </summary>
-        MonoLifeGrid<TValue> Current { get; }
+        MonoLifeGrid<TValue>? Current { get; }
 
         /// <summary>
         ///     Set start generation.

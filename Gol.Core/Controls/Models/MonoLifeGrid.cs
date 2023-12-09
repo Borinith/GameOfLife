@@ -11,14 +11,7 @@ namespace Gol.Core.Controls.Models
     public class MonoLifeGrid<TValue>
     {
         [DataMember]
-        private TValue[][] _sourceArray;
-
-        /// <summary>
-        ///     Constructor for <see cref="MonoLifeGrid{TValue}" />.
-        /// </summary>
-        public MonoLifeGrid()
-        {
-        }
+        private TValue[][] _sourceArray = null!;
 
         /// <summary>
         ///     Constructor for <see cref="MonoLifeGrid{TValue}" />.

@@ -29,19 +29,21 @@ namespace Gol.Core.Prism
                 throw new ArgumentNullException(nameof(propertyExpression));
             }
 
-            if (!(propertyExpression.Body is MemberExpression body))
+            if (propertyExpression.Body is not MemberExpression body)
             {
                 throw new ArgumentException();
             }
 
             var member = body.Member as PropertyInfo;
 
-            if (member == null || member.GetGetMethod(true) is null)
+            if (member == null)
             {
                 throw new ArgumentException();
             }
 
-            if (member.GetGetMethod(true)!.IsStatic)
+            var methodInfo = member.GetGetMethod(true);
+
+            if (methodInfo is null || methodInfo.IsStatic)
             {
                 throw new ArgumentException();
             }

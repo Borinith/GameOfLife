@@ -65,8 +65,11 @@ namespace Gol.Core.Algorithm
 
             set
             {
-                _boundType = value;
-                RaisePropertyChanged(nameof(BoundType));
+                if (_boundType != value)
+                {
+                    _boundType = value;
+                    RaisePropertyChanged(nameof(BoundType));
+                }
             }
         }
 
@@ -92,7 +95,7 @@ namespace Gol.Core.Algorithm
         {
             get => _previous;
 
-            private set
+            private init
             {
                 if (_previous != value)
                 {
@@ -176,14 +179,11 @@ namespace Gol.Core.Algorithm
         public void Field(FieldType fieldType)
         {
             BoundType = fieldType;
-            NotificationObjectStatic.OnStaticPropertyChanged(nameof(BoundType));
+            RaisePropertyChanged(nameof(BoundType));
         }
 
         private int IsBlack(int x, int y, MonoLifeGrid<bool> field)
         {
-            //BoundType = BoundType;
-            //NotificationObjectStatic.OnStaticPropertyChanged(nameof(BoundType));
-
             if (BoundType == FieldType.Infinity)
             {
                 if (x < 0)
