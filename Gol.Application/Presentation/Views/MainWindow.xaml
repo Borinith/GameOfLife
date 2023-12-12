@@ -9,7 +9,10 @@
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="Game of life" Height="750" Width="1024">
+        Title="Game of life"
+        Height="750"
+        Width="1024"
+        WindowState="Maximized">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3" />
@@ -33,10 +36,13 @@
             <MenuItem Header="Life">
                 <MenuItem Header="Start" Command="{Binding StartCommand}" />
                 <MenuItem Header="Stop" Command="{Binding StopCommand}" />
+                <MenuItem Header="Step" Command="{Binding StepCommand}" />
             </MenuItem>
             <MenuItem Header="Field">
-                <MenuItem Header="Infinity" IsChecked="{Binding InfinityCommand}" Command="{Binding InfinityCommand}" />
-                <MenuItem Header="Bound" IsChecked="{Binding BoundCommand}" Command="{Binding BoundCommand}" />
+                <MenuItem Header="Infinity" IsCheckable="True" IsChecked="{Binding IsInfinity}"
+                          Command="{Binding InfinityCommand}" />
+                <MenuItem Header="Bound" IsCheckable="True" IsChecked="{Binding IsBound}"
+                          Command="{Binding BoundCommand}" />
             </MenuItem>
             <MenuItem Header="About" Command="{Binding AboutCommand}" />
         </Menu>
@@ -49,9 +55,10 @@
             </b:Interaction.Behaviors>
         </ScrollViewer>
         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Grid.Row="2">
-            <Button Command="{Binding StartCommand}" Content="Start" />
-            <Button Command="{Binding StopCommand}" Content="Stop" />
+            <Button Command="{Binding StartStopCommand}" Content="{Binding StartStopText}" />
+            <Button Command="{Binding StepCommand}" Content="Step" />
             <Button Command="{Binding RandomCommand}" Content="Random" />
+            <Button Command="{Binding NewCommand}" Content="Clear" />
             <TextBlock VerticalAlignment="Center" Margin="3,0">
                 Generation:
                 <Run Text="{Binding DoubleStateLife.GenerationNumber, FallbackValue=0}" />
@@ -59,8 +66,8 @@
         </StackPanel>
         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2">
             <TextBlock VerticalAlignment="Center" Margin="13,0">
-                BoundType:
-                <Run Text="{Binding DoubleStateLife.BoundType, FallbackValue=0 }" />
+                Field type:
+                <Run Text="{Binding DoubleStateLife.FieldType }" />
             </TextBlock>
         </StackPanel>
     </Grid>

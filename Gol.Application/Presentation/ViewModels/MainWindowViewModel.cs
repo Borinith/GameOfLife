@@ -2,6 +2,7 @@
 using Gol.Application.Utils;
 using Gol.Core.Algorithm;
 using Gol.Core.Controls.Models;
+using Gol.Core.Data;
 using Gol.Core.Prism;
 using System;
 
@@ -12,10 +13,14 @@ namespace Gol.Application.Presentation.ViewModels
     /// </summary>
     public class MainWindowViewModel : NotificationObject
     {
-        private const int DEFAULT_FIELD_WIDTH = 126;
-        private const int DEFAULT_FIELD_HEIGHT = 58;
+        private const int DEFAULT_FIELD_WIDTH = 130;
+        private const int DEFAULT_FIELD_HEIGHT = 60;
 
-        private DoubleStateLife _doubleStateLife;
+        private ILifeControl<bool> _doubleStateLife;
+        private bool _isBound;
+        private bool _isInfinity;
+        private bool _isStart;
+        private string _startStopText = null!;
 
         /// <summary>
         ///     Constructor for <see cref="MainWindowViewModel" />.
@@ -23,10 +28,15 @@ namespace Gol.Application.Presentation.ViewModels
         public MainWindowViewModel()
         {
             var grid = new MonoLifeGrid<bool>(new bool[DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT], Guid.NewGuid());
+            IsStart = true;
 
-            _doubleStateLife = new DoubleStateLife(grid);
+            _doubleStateLife = new DoubleStateLife(grid, true);
+            Infinity(null);
+
             StartCommand = new DelegateCommand(Start);
             StopCommand = new DelegateCommand(Stop);
+            StartStopCommand = new DelegateCommand(StartStop);
+            StepCommand = new DelegateCommand(Step);
             RandomCommand = new DelegateCommand(Rand);
             SaveCommand = new DelegateCommand(Save);
             ExitCommand = new DelegateCommand(Exit);
@@ -37,10 +47,60 @@ namespace Gol.Application.Presentation.ViewModels
             BoundCommand = new DelegateCommand(Bound);
         }
 
+        private bool IsStart
+        {
+            get => _isStart;
+
+            set
+            {
+                _isStart = value;
+                StartStopText = _isStart ? "Start" : "Stop";
+            }
+        }
+
+        public string StartStopText
+        {
+            get => _startStopText;
+
+            set
+            {
+                _startStopText = value;
+                RaisePropertyChanged(nameof(StartStopText));
+            }
+        }
+
+        /// <summary>
+        ///     Field type is infinity
+        /// </summary>
+        public bool IsInfinity
+        {
+            get => _isInfinity;
+
+            set
+            {
+                _isInfinity = value;
+                RaisePropertyChanged(nameof(IsInfinity));
+            }
+        }
+
+        /// <summary>
+        ///     Field type is bound
+        /// </summary>
+        public bool IsBound
+        {
+            get => _isBound;
+
+            set
+            {
+                _isBound = value;
+                RaisePropertyChanged(nameof(IsBound));
+            }
+        }
+
         /// <summary>
         ///     Mono grid controller.
         /// </summary>
-        public DoubleStateLife DoubleStateLife
+        public ILifeControl<bool> DoubleStateLife
         {
             get => _doubleStateLife;
 
@@ -75,6 +135,21 @@ namespace Gol.Application.Presentation.ViewModels
         public DelegateCommand StartCommand { get; }
 
         /// <summary>
+        ///     Stop command.
+        /// </summary>
+        public DelegateCommand StopCommand { get; }
+
+        /// <summary>
+        ///     Start or stop command.
+        /// </summary>
+        public DelegateCommand StartStopCommand { get; }
+
+        /// <summary>
+        ///     Step command.
+        /// </summary>
+        public DelegateCommand StepCommand { get; }
+
+        /// <summary>
         ///     Open command.
         /// </summary>
         public DelegateCommand OpenCommand { get; }
@@ -85,11 +160,6 @@ namespace Gol.Application.Presentation.ViewModels
         public DelegateCommand SaveCommand { get; }
 
         /// <summary>
-        ///     Stop command.
-        /// </summary>
-        public DelegateCommand StopCommand { get; }
-
-        /// <summary>
         ///     Random command.
         /// </summary>
         public DelegateCommand RandomCommand { get; }
@@ -97,12 +167,12 @@ namespace Gol.Application.Presentation.ViewModels
         /// <summary>
         ///     Infinity field.
         /// </summary>
-        public DelegateCommand InfinityCommand { get; set; }
+        public DelegateCommand InfinityCommand { get; }
 
         /// <summary>
         ///     Bound field.
         /// </summary>
-        public DelegateCommand BoundCommand { get; set; }
+        public DelegateCommand BoundCommand { get; }
 
         private static void About(object? obj)
         {
@@ -144,12 +214,40 @@ namespace Gol.Application.Presentation.ViewModels
 
         private void Start(object? obj)
         {
-            DoubleStateLife.Start();
+            if (IsStart)
+            {
+                IsStart = false;
+                DoubleStateLife.Start();
+            }
         }
 
         private void Stop(object? obj)
         {
-            DoubleStateLife.Stop();
+            if (!IsStart)
+            {
+                IsStart = true;
+                DoubleStateLife.Stop();
+            }
+        }
+
+        private void StartStop(object? obj)
+        {
+            if (IsStart)
+            {
+                IsStart = false;
+                DoubleStateLife.Start();
+            }
+            else
+            {
+                IsStart = true;
+                DoubleStateLife.Stop();
+            }
+        }
+
+        private void Step(object? obj)
+        {
+            IsStart = true;
+            DoubleStateLife.Step();
         }
 
         private void Rand(object? obj)
@@ -159,18 +257,35 @@ namespace Gol.Application.Presentation.ViewModels
 
         private void New(object? obj)
         {
+            IsStart = true;
             var grid = new MonoLifeGrid<bool>(new bool[DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT], Guid.NewGuid());
             DoubleStateLife = new DoubleStateLife(grid);
         }
 
         private void Infinity(object? obj)
         {
+            SwitchFieldType(FieldType.Infinity);
             DoubleStateLife.Field(FieldType.Infinity);
         }
 
         private void Bound(object? obj)
         {
+            SwitchFieldType(FieldType.Bound);
             DoubleStateLife.Field(FieldType.Bound);
+        }
+
+        private void SwitchFieldType(FieldType fieldType)
+        {
+            if (fieldType == FieldType.Infinity)
+            {
+                IsInfinity = true;
+                IsBound = false;
+            }
+            else
+            {
+                IsInfinity = false;
+                IsBound = true;
+            }
         }
     }
 }

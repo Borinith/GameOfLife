@@ -35,8 +35,8 @@ namespace Gol.Core.Algorithm
         };
 
         private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(35);
-        private FieldType _boundType;
         private MonoLifeGrid<bool>? _current;
+        private FieldType _fieldType;
         private int _generationNumber;
         private MonoLifeGrid<bool>? _previous;
         private bool _stopUpdateTimer;
@@ -44,38 +44,34 @@ namespace Gol.Core.Algorithm
         /// <summary>
         ///     Constructor for <see cref="DoubleStateLife" />.
         /// </summary>
-        public DoubleStateLife(MonoLifeGrid<bool>? current) : this()
+        /// <param name="current"></param>
+        /// <param name="useRandom"></param>
+        public DoubleStateLife(MonoLifeGrid<bool>? current, bool useRandom = false)
         {
             SetCurrent(current);
+
+            if (useRandom)
+            {
+                Random();
+            }
         }
 
-        /// <summary>
-        ///     Constructor for <see cref="DoubleStateLife" />.
-        /// </summary>
-        private DoubleStateLife()
+        /// <inheritdoc />
+        public FieldType FieldType
         {
-        }
-
-        /// <summary>
-        ///     Bound type.
-        /// </summary>
-        public FieldType BoundType
-        {
-            get => _boundType;
+            get => _fieldType;
 
             set
             {
-                if (_boundType != value)
+                if (_fieldType != value)
                 {
-                    _boundType = value;
-                    RaisePropertyChanged(nameof(BoundType));
+                    _fieldType = value;
+                    RaisePropertyChanged(nameof(FieldType));
                 }
             }
         }
 
-        /// <summary>
-        ///     Generation number.
-        /// </summary>
+        /// <inheritdoc />
         public int GenerationNumber
         {
             get => _generationNumber;
@@ -153,6 +149,18 @@ namespace Gol.Core.Algorithm
         }
 
         /// <inheritdoc />
+        public async void Step()
+        {
+            if (Current == null || Current.Height == 0 || Current.Width == 0)
+            {
+                return;
+            }
+
+            _stopUpdateTimer = true;
+            await LifeStep();
+        }
+
+        /// <inheritdoc />
         public async void Random()
         {
             await Task.Run(() =>
@@ -173,18 +181,21 @@ namespace Gol.Core.Algorithm
 
                 RaisePropertyChanged(nameof(Current));
                 RaisePropertyChanged(nameof(Previous));
+
+                SetCurrent(_current);
             });
         }
 
+        /// <inheritdoc />
         public void Field(FieldType fieldType)
         {
-            BoundType = fieldType;
-            RaisePropertyChanged(nameof(BoundType));
+            FieldType = fieldType;
+            RaisePropertyChanged(nameof(FieldType));
         }
 
         private int IsBlack(int x, int y, MonoLifeGrid<bool> field)
         {
-            if (BoundType == FieldType.Infinity)
+            if (FieldType == FieldType.Infinity)
             {
                 if (x < 0)
                 {
