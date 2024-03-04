@@ -190,6 +190,7 @@ namespace Gol.Application.Presentation.ViewModels
             {
                 using (fileStream)
                 {
+                    IsStart = true;
                     var grid = SerializationUtils.Read<MonoLifeGrid<bool>>(fileStream!);
                     DoubleStateLife = new DoubleStateLife(grid);
                 }

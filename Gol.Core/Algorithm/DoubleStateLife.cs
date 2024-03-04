@@ -4,6 +4,7 @@ using Gol.Core.Prism;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Gol.Core.Algorithm
@@ -34,6 +35,7 @@ namespace Gol.Core.Algorithm
             new(1, 1)
         };
 
+        private readonly Random? _random;
         private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(35);
         private MonoLifeGrid<bool>? _current;
         private FieldType _fieldType;
@@ -48,6 +50,8 @@ namespace Gol.Core.Algorithm
         /// <param name="useRandom"></param>
         public DoubleStateLife(MonoLifeGrid<bool>? current, bool useRandom = false)
         {
+            _random ??= new Random(GetSeed());
+
             SetCurrent(current);
 
             if (useRandom)
@@ -168,14 +172,12 @@ namespace Gol.Core.Algorithm
                 _previous = _current;
                 _current = _current!.Clone();
 
-                var random = new Random();
-
                 for (var i = 0; i < _current.Width; i++)
                 {
                     for (var j = 0; j < _current.Height; j++)
                     {
                         // Will be true 25% of the time
-                        _current[i, j] = random.Next(100) < 25;
+                        _current[i, j] = _random!.Next(100) < 25;
                     }
                 }
 
@@ -191,6 +193,17 @@ namespace Gol.Core.Algorithm
         {
             FieldType = fieldType;
             RaisePropertyChanged(nameof(FieldType));
+        }
+
+        private static int GetSeed()
+        {
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                var intBytes = new byte[4];
+                rng.GetBytes(intBytes);
+
+                return BitConverter.ToInt32(intBytes, 0);
+            }
         }
 
         private int IsBlack(int x, int y, MonoLifeGrid<bool> field)
